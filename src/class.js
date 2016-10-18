@@ -196,6 +196,7 @@
              * @return {string}
              */
             function toString() {
+                /* 调用该方法的对象的构造函数 Function.prototype.toString*/
                 return toFunctionString.call(this.prototype.constructor);
             }
 
@@ -217,6 +218,15 @@
 })(
     typeof define === 'function' && define.amd
         ? define
+        /* 该方法作为实参被传入最外层立即执行的函数，形参为define
+         * define会做一件事情，就是将传入define的工厂方法立即执行，并传入全局对象reqiure作为factory的参数, factory执行结果赋值给全局的module.exports。
+         * 
+         * 问题：1. 没有给这个factory的产出一个名字，define后如何加载呢？
+         *         答：编译产出的时候会加上吧。这是运行在node环境中的，不需要产出一个名字。因为是同步var u = require("./util");直接赋值给了u
+                       而浏览器端是通过<script>方式加载异步加载所需js的，加载后没法直接复制给一个变量，所以就需要一个名字，通过这个名字可以找到对应的模块（require对象来全局维护）
+                       需要注意的是，如果某个异步模块已经被加载了，那么就可以直接通过var u = require("module_name");的方式获取该模块
+                    （详见AMD规范）
+         */
         : function (factory) {
         module.exports = factory(require);
     }
